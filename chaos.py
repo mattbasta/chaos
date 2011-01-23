@@ -53,7 +53,7 @@ def perform_replace(args, file, node, base, child, field, index,
         log.write("Line %d:%d\n" % (child.lineno, child.col_offset))
         log.write("Code:\n")
         log.write(codegen.to_source(child))
-        log.write("\n")
+        log.write("\n\n\n")
         log.close()
     
     if index is not None:
@@ -89,6 +89,14 @@ def process_node(base, node, args, file, raw):
         else:
             for i in range(len(field)):
                 child = field[i]
+
+                # Ignore docstrings
+                if i == 1 and \
+                   isinstance(node, (ast.FunctionDef,
+                                     ast.ClassDef)) and \
+                   isinstance(child, ast.Expr):
+                    continue
+
                 if isinstance(child, TRY_DELETE):
                     perform_replace(args=args,
                                     file=file,
