@@ -104,9 +104,8 @@ def process_node(base, node, args, file, raw):
         else:
             for i in range(len(field)):
                 child = field[i]
-
                 # Ignore docstrings
-                if i == 1 and \
+                if i == 0 and \
                    isinstance(node, (ast.FunctionDef,
                                      ast.ClassDef)) and \
                    isinstance(child, ast.Expr):
@@ -138,7 +137,7 @@ def iter_dir(dir, args):
     "Iterates a directory and wreaks havoc"
     
     for item in os.listdir(dir):
-        if item.startswith(".") or item.startswith("test_"):
+        if item.startswith("."):
             continue
         item = "%s/%s" % (dir, item)
         
@@ -148,7 +147,8 @@ def iter_dir(dir, args):
         elif not item.endswith(".py"):
             continue
 
-        if any(fnmatch(item, excl) for excl in args.exclude):
+        if args.exclude and \
+           any(fnmatch(item, excl) for excl in args.exclude):
             continue
 
         print "Chaos on %s" % item
