@@ -1,0 +1,31 @@
+Chaos Chimp
+v0.1
+          __
+     w  c(..)o   (
+      \__(-)    __)
+          /\   (
+         /(_)___)
+         w /|
+          | \
+          m m
+
+Graphic by ejm97
+
+
+Chaos Chimp is designed around the principle of Netflix's Chaos Monkey testing
+platform. The idea is that if a piece of code is permuted such that it *should*
+break the tests and the tests don't fail, the code is either:
+
+- Dead
+- Uncovered
+
+Chaos Chimp goes a long way to make this work. It sequentially breaks nodes in
+a Python script's AST tree. If the tests pass after each modification, then a
+failure is logged and the AST node is saved for later analysis.
+
+I designed Chaos Chimp to aid in improving deep code coverage of Mozilla's
+amo-validator:
+
+https://github.com/mattbasta/amo-validator
+
+
