@@ -2,6 +2,7 @@ import argparse
 import ast
 import codegen
 import os
+import signal
 import subprocess
 from fnmatch import fnmatch
 from StringIO import StringIO
@@ -17,15 +18,29 @@ TRY_DELETE_EXPR = (ast.BoolOp, ast.BinOp, ast.UnaryOp, ast.Lambda, ast.IfExp,
 SPECIAL_CASES = ()
 AST_NONE = ast.parse("None").body[0]
 
+class Alarm(Exception):
+    pass
+
+def alarm_handler(signum, frame):
+    raise Alarm
+
 def run_tests(args):
     "Runs the unit tests"
     
+    signal.signal(signal.SIGALRM, alarm_handler)
+    signal.alarm(args.timeout)
     tests = subprocess.Popen(args.tests,
                              shell=False,
                              stdout=subprocess.PIPE,
                              stderr=subprocess.PIPE)
-    data, stderr = tests.communicate()
-    return tests.wait() == 0
+    try:
+        data, stderr = tests.communicate()
+        signal.alarm(0)
+        return tests.wait() == 0 and not signal.alarm(0)
+    except Alarm:
+        tests.kill()
+        print "Hit timeout; passed"
+        return True # Passed
 
 def perform_replace(args, file, node, base, child, field, index,
                     newnode=AST_NONE):
@@ -161,6 +176,11 @@ def main():
     parser.add_argument("--exclude",
                         nargs="*",
                         help="File patterns to exclude")
+    parser.add_argument("--timeout",
+                        type=int,
+                        default=20,
+                        help="The maximum number of seconds the tests should "
+                             "run for before being considered failed")
 
     args = parser.parse_args()
 
