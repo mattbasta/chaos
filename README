@@ -12,9 +12,42 @@ v0.1
 Graphic by ejm97
 
 
-Chaos Chimp is designed around the principle of Netflix's Chaos Monkey testing
-platform. The idea is that if a piece of code is permuted such that it *should*
-break the tests and the tests don't fail, the code is either:
+Chaos Chimp was inspired by the methodology of Netflix's Chaos Monkey testing
+platform. Chaos Monkey randomly kills production servers to ensure that the
+Netflix architecture can withstand constant, unpredictable failures.
+
+Rather than kill servers, Chaos Chimp kills source code. Since it's impractical
+(and dangerous) to break code on production, the chimp is run as a batch job
+before deploying a round of code. And since we're running it as a batch job,
+the chimp does its job in a thorough and sequential way (as opposed to working
+randomly).
+
+Using Chaos Chimp:
+
+It's easiest to run chaos from the directory of your codebase.
+
+    python ~/chaos/chaos.py --code <path to codebase> --tests <command to
+        run tests> [--exclude <wildcard patterns to ignore>] [--timeout <test
+        timeout duration (sec)>]
+
+
+    --code : The path to the codebase.
+    --tests : The command to run tests. This script should be a synchronous
+              process that does not terminate until tests have completed.
+    --exclude : Patterns to exclude from testing. You may wish to exclude
+                unit tests themselves from testing.
+    --timeout : The duration in seconds that the unit tests should complete
+                within. This is to prevent infinite loops from hanging the
+                test script.
+
+Example:
+
+    python chaos/chaos.py --code . --tests nosetests --exclude ./chaos/*
+        ./tests/* --timeout 60
+
+    python ../chaos/chaos.py --code validator --tests fab test --timeout 15
+
+Based on the output of Chaos Chimp, code can be identified as either:
 
 - Dead
 - Uncovered
