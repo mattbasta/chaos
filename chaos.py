@@ -14,7 +14,7 @@ TRY_DELETE = (ast.For, ast.Assert, ast.Assign, ast.AugAssign, ast.ClassDef,
               ast.While, ast.With, )
 TRY_DELETE_EXPR = (ast.BoolOp, ast.BinOp, ast.UnaryOp, ast.Lambda, ast.IfExp,
                    ast.Dict, ast.ListComp, ast.GeneratorExp, ast.Yield,
-                   ast.Compare, ast.Tuple, )
+                   ast.Compare, )
 SPECIAL_CASES = ()
 AST_NONE = ast.parse("None").body[0]
 
