@@ -29,6 +29,7 @@ def run_tests(args):
     
     signal.signal(signal.SIGALRM, alarm_handler)
     signal.alarm(args.timeout)
+    tests = None # Declare in advance
     
     try:
         tests = subprocess.Popen(args.tests,
