@@ -29,11 +29,12 @@ def run_tests(args):
     
     signal.signal(signal.SIGALRM, alarm_handler)
     signal.alarm(args.timeout)
-    tests = subprocess.Popen(args.tests,
-                             shell=False,
-                             stdout=subprocess.PIPE,
-                             stderr=subprocess.PIPE)
+    
     try:
+        tests = subprocess.Popen(args.tests,
+                                 shell=False,
+                                 stdout=subprocess.PIPE,
+                                 stderr=subprocess.PIPE)
         data, stderr = tests.communicate()
         signal.alarm(0)
         return tests.wait() == 0 and not signal.alarm(0)
