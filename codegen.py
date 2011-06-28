@@ -150,7 +150,7 @@ class SourceGenerator(NodeVisitor):
             self.visit(decorator)
 
     # Statements
-    
+
     def visit_Assert(self, node):
         self.newline(node)
         self.write("assert ")
@@ -308,7 +308,8 @@ class SourceGenerator(NodeVisitor):
     def visit_Delete(self, node):
         self.newline(node)
         self.write('del ')
-        for idx, target in enumerate(node):
+        # Sometimes we can enumerate deletions.
+        for idx, target in enumerate(node.targets):
             if idx:
                 self.write(', ')
             self.visit(target)
