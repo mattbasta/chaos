@@ -25,13 +25,13 @@ def alarm_handler(signum, frame):
 
 def run_tests(args):
     "Runs the unit tests"
-    
+
     signal.signal(signal.SIGALRM, alarm_handler)
     signal.alarm(args.timeout)
     tests = None # Declare in advance
-    
+
     try:
-        tests = subprocess.Popen(args.tests,
+        tests = subprocess.Popen(args.tests.split(" "),
                                  shell=False,
                                  stdout=subprocess.PIPE,
                                  stderr=subprocess.PIPE)
@@ -46,7 +46,7 @@ def run_tests(args):
 def perform_replace(args, file, node, base, child, field, index,
                     newnode=AST_NONE):
     "Replaces a node with another"
-    
+
     print "Replacing %s" % str(child)
 
     oldnodes = None
@@ -71,12 +71,12 @@ def perform_replace(args, file, node, base, child, field, index,
         log.write(codegen.to_source(child))
         log.write("\n\n\n")
         log.close()
-    
+
     if index is not None:
         setattr(node, field, oldnodes)
     else:
         setattr(node, field, child)
-    
+
 def process_node(base, node, args, file, raw):
     "Processes a node in the AST tree"
 
@@ -129,19 +129,19 @@ def process_node(base, node, args, file, raw):
                                     field=name,
                                     index=i,
                                     newnode=AST_NONE.value)
-    
+
     for child in ast.iter_child_nodes(node):
         process_node(base, child, args, file, raw)
 
 
 def iter_dir(dir, args):
     "Iterates a directory and wreaks havoc"
-    
+
     for item in os.listdir(dir):
         if item.startswith("."):
             continue
         item = "%s/%s" % (dir, item)
-        
+
         if os.path.isdir(item):
             iter_dir(item, args)
             continue
@@ -167,12 +167,11 @@ def iter_dir(dir, args):
 
 def main():
     "Initialize the primate"
-    
+
     parser = argparse.ArgumentParser(description="Finding your crappy code")
     parser.add_argument("--code",
                         help="Path to the root of your codebase")
     parser.add_argument("--tests",
-                        nargs="*",
                         help="The command to run the test suite")
     parser.add_argument("--exclude",
                         nargs="*",
