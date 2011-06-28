@@ -7,6 +7,7 @@ import subprocess
 from fnmatch import fnmatch
 from StringIO import StringIO
 
+
 TRY_DELETE = (ast.For, ast.Assert, ast.Assign, ast.AugAssign, ast.ClassDef,
               ast.Expr, ast.ExceptHandler, ast.For, ast.FunctionDef,
               ast.Global, ast.If, ast.Import, ast.ImportFrom,
@@ -17,11 +18,14 @@ TRY_DELETE_EXPR = (ast.BoolOp, ast.BinOp, ast.UnaryOp, ast.Lambda, ast.IfExp,
 SPECIAL_CASES = ()
 AST_NONE = ast.parse("None").body[0]
 
+
 class Alarm(Exception):
     pass
 
+
 def alarm_handler(signum, frame):
     raise Alarm
+
 
 def run_tests(args):
     "Runs the unit tests"
@@ -41,13 +45,14 @@ def run_tests(args):
     except Alarm:
         tests.kill()
         print "Hit timeout; passed"
-        return True # Passed
+        return True  # Passed
+
 
 def perform_replace(args, file, node, base, child, field, index,
                     newnode=AST_NONE):
     "Replaces a node with another"
 
-    print "Replacing %s" % str(child)
+    print "\tReplacing %s (Line %d)" % (str(child), child.lineno)
 
     oldnodes = None
     if index is not None:
@@ -63,7 +68,7 @@ def perform_replace(args, file, node, base, child, field, index,
 
     # It's a failure when the tests pass
     if run_tests(args):
-        print "Failed"
+        print "\t\tFound uncovered code"
         log = open("%s.log" % file, mode="a")
         log.write("Failure:\n")
         log.write("Line %d:%d\n" % (child.lineno, child.col_offset))
@@ -76,6 +81,7 @@ def perform_replace(args, file, node, base, child, field, index,
         setattr(node, field, oldnodes)
     else:
         setattr(node, field, child)
+
 
 def process_node(base, node, args, file, raw):
     "Processes a node in the AST tree"
