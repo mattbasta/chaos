@@ -169,6 +169,11 @@ def iter_dir(dir, args):
 
         # Replace the original copy
         open(item, mode="w").write(raw)
+        try:
+            # Delete the PYC file.
+            os.unlink("%sc" % item)
+        except Exception:
+            pass
 
 
 def main():
